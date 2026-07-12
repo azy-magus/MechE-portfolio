@@ -1056,6 +1056,40 @@ function wireCards(){
     c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
   });
 }
+/* ---- auto-discover extra project images: images/<slug>/image (1).jpg, (2).png, ... ---- */
+const AUTO_EXTS = ['jpg','jpeg','png','JPG','PNG'];   // tried in this order
+const AUTO_MAX  = 30;   // stop looking after this many
+const AUTO_GAP  = 1;    // tolerate this many missing numbers before giving up
+function probeImg(url){
+  return new Promise(res=>{ const im=new Image(); im.onload=()=>res(true); im.onerror=()=>res(false); im.src=url; });
+}
+function wireGallery(p, gimgs){
+  const gal = document.getElementById('gal');
+  if(!gal) return;
+  const rewire = () => gal.querySelectorAll('img').forEach((im,i)=>{ im.onclick = ()=>openLightbox(gimgs,i); });
+  rewire();
+  if((p.gallery||[]).length) return;          // an explicit list in data.js wins — skip discovery
+  (async () => {
+    const token = p.slug;                     // bail out if the user navigates away mid-scan
+    let misses = 0;
+    for(let n=1; n<=AUTO_MAX && misses<=AUTO_GAP; n++){
+      let url = null;
+      for(const ext of AUTO_EXTS){
+        const cand = encodeURI(`images/${p.slug}/image (${n}).${ext}`);
+        if(await probeImg(cand)){ url = cand; break; }
+      }
+      if(!url){ misses++; continue; }
+      misses = 0;
+      if(activeSlug !== token) return;        // user opened a different project
+      gimgs.push(url);
+      const im = document.createElement('img');
+      im.src = url; im.alt = `${p.title} ${gimgs.length}`;
+      im.loading = 'lazy'; im.decoding = 'async';
+      gal.appendChild(im);
+      rewire();
+    }
+  })();
+}
 function openProject(slug){
   const p=DATA.projects.find(x=>x.slug===slug);
   if(!p) return;
@@ -1070,7 +1104,7 @@ function openProject(slug){
       <span class="back" id="backBtn" role="button" tabindex="0">&larr; Back to folder</span>
       <h2>${p.title}</h2>
       <div class="drule"></div>
-      <div class="gallery">${gimgs.map((src,i)=>`<img src="${src}" alt="${p.title}${i?' '+(i+1):''}" loading="lazy" decoding="async">`).join('')}</div>
+      <div class="gallery" id="gal">${gimgs.map((src,i)=>`<img src="${src}" alt="${p.title}${i?' '+(i+1):''}" loading="lazy" decoding="async">`).join('')}</div>
       <p class="desc">${p.desc}</p>
       ${cs? `<div class="case">
         ${cs.problem? `<div class="cs"><h4>Problem</h4><p>${cs.problem}</p></div>`:''}
@@ -1086,7 +1120,7 @@ function openProject(slug){
   const bb=document.getElementById('backBtn');
   bb.addEventListener('click',()=>showGrid(p.cat));
   bb.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showGrid(p.cat);}});
-  content.querySelectorAll('.gallery img').forEach((im,i)=>im.addEventListener('click',()=>openLightbox(gimgs,i)));
+  wireGallery(p, gimgs);
   content.scrollTop=0;
 }
 function gotoProject(slug){
