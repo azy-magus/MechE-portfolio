@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#090c0c"/>
-  <rect x="4.5" y="4.5" width="55" height="55" rx="10" fill="none" stroke="#28403a" stroke-width="1.5"/>
-  <text x="32" y="39" font-family="'JetBrains Mono',Menlo,Consolas,monospace" font-size="26" font-weight="700" fill="#5eead4" text-anchor="middle">SA</text>
-  <rect x="18" y="46" width="28" height="2.5" rx="1.25" fill="#5eead4"/>
-</svg>
