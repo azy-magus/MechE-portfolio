@@ -7,7 +7,7 @@
 
 const DATA = {
   "profile": {
-    "name": "SUGAM ARYAL",
+    "name": "Sugam Aryal",
     "role": "Mechanical Design Engineer",
     "tagline": "From CAD to commissioning — engineering for the real world.",
     "location": "Kathmandu, Nepal",
@@ -39,7 +39,7 @@ const DATA = {
       "id": "experience",
       "num": "03",
       "kicker": "EXPERIENCE",
-      "headline": "From CAD to the **shop** __floor__."
+      "headline": "From CAD to **shop** __floor__."
     },
     {
       "id": "projects",
